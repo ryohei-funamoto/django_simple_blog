@@ -1,0 +1,15 @@
+{% extends 'simple_blog/base.html' %}
+{% block content %}
+    <ul class="articles">
+        {% for article in articles %}
+            <li class="article">
+                <p><a href="">{{ article.title }}</a></p>
+                <p>{{ article.content|truncatechars:50 }}</p>
+                <p>投稿日：<time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:'Y/m/d' }}</time></p>
+                <p>更新日：<time datetime="{{ article.updated_at|date:'Y-m-d' }}">{{ article.updated_at|date:'Y/m/d' }}</time></p>
+            </li>
+        {% empty %}
+            <li>投稿された記事はありません。</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
