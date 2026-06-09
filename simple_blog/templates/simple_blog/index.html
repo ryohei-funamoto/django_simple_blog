@@ -3,7 +3,7 @@
     <ul class="articles">
         {% for article in articles %}
             <li class="article">
-                <p><a href="">{{ article.title }}</a></p>
+                <p><a href="{% url 'simple_blog:show' id=article.id %}">{{ article.title }}</a></p>
                 <p>{{ article.content|truncatechars:50 }}</p>
                 <p>投稿日：<time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:'Y/m/d' }}</time></p>
                 <p>更新日：<time datetime="{{ article.updated_at|date:'Y-m-d' }}">{{ article.updated_at|date:'Y/m/d' }}</time></p>
