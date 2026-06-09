@@ -7,7 +7,11 @@
 </head>
 <body>
     <header>
-        <h1>Simple Blog</h1>
+        {% if request.path == '/' %}
+            <h1>Simple Blog</h1>
+        {% else %}
+            <p><a href="{% url 'simple_blog:index' %}">Simple Blog</a></p>
+        {% endif %}
     </header>
     {% block content %}{% endblock %}
 </body>
