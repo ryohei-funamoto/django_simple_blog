@@ -12,6 +12,17 @@
         {% else %}
             <p><a href="{% url 'simple_blog:index' %}">Simple Blog</a></p>
         {% endif %}
+        {% if user.is_authenticated %}
+            <p>ようこそ、 {{ user.username }} さん</p>
+            <form action="{% url 'logout' %}" method="POST">
+                {% csrf_token %}
+                <div>
+                    <button type="submit">ログアウト</button>
+                </div>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}">ログイン</a></p>
+        {% endif %}
     </header>
     {% block content %}{% endblock %}
 </body>
