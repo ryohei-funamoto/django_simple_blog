@@ -14,6 +14,7 @@
         {% endif %}
         {% if user.is_authenticated %}
             <p>ようこそ、 {{ user.username }} さん</p>
+            <p><a href="{% url 'simple_blog:create' %}">記事作成ページ</a></p>
             <form action="{% url 'logout' %}" method="POST">
                 {% csrf_token %}
                 <div>

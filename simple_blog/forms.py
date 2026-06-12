@@ -9,3 +9,11 @@ class ArticleForm(forms.ModelForm):
             'title': 'タイトル',
             'content': '本文',
         }
+        error_messages = {
+            'title': {
+                'required': 'タイトルを入力してください',
+            },
+            'content': {
+                'required': '本文を入力してください',
+            },
+        }
