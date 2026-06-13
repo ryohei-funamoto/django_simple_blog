@@ -8,6 +8,12 @@
     {% if user.is_authenticated and user == article.user %}
         <ul>
             <li><a href="{% url 'simple_blog:update' id=article.id %}">記事を編集する</a></li>
+            <li>
+                <form action="{% url 'simple_blog:delete' id=article.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('記事を削除しますか？')">削除する</button>
+                </form>
+            </li>
         </ul>
     {% endif %}
     <ul>
