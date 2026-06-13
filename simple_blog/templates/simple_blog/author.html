@@ -1,5 +1,7 @@
 {% extends 'components/base.html' %}
+{% block title %}{{ author.username }} の記事一覧 | {{ block.super }}{% endblock %}
 {% block content %}
+    <h1>{{ author.username }} の記事一覧</h1>
     <ul class="articles">
         {% for article in articles %}
             <li class="article">

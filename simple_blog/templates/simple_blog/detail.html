@@ -2,6 +2,7 @@
 {% block title %}{{ article.title }} | {{ block.super }}{% endblock %}
 {% block content %}
     <h1>{{ article.title }}</h1>
+    <p>投稿者：<a href="{% url 'simple_blog:author' id=article.user.id %}">{{ article.user }}</a></p>
     <p>投稿日：<time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:'Y/m/d' }}</time></p>
     <p>更新日：<time datetime="{{ article.updated_at|date:'Y-m-d' }}">{{ article.updated_at|date:'Y/m/d' }}</time></p>
     <p>{{ article.content|linebreaksbr }}</p>
