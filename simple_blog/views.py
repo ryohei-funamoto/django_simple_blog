@@ -78,3 +78,25 @@ def update(request, id):
         )
     else:
         raise PermissionDenied
+
+@login_required
+def delete(request, id):
+    article = get_object_or_404(Article, pk=id)
+
+    if request.user == article.user:
+        if request.method == 'POST':
+            article.delete()
+
+            return redirect('simple_blog:index')
+
+        context = {
+            'article': article,
+        }
+
+        return render(
+            request,
+            'simple_blog/detail.html',
+            context=context,
+        )
+    else:
+        raise PermissionDenied
