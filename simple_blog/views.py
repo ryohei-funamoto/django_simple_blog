@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from .models import Article
@@ -100,3 +101,20 @@ def delete(request, id):
         )
     else:
         raise PermissionDenied
+
+def author(request, id):
+    User = get_user_model()
+    author = get_object_or_404(User, pk=id)
+
+    articles = Article.objects.filter(user_id=author.id).order_by('-created_at')
+
+    context = {
+        'author': author,
+        'articles': articles,
+    }
+
+    return render(
+        request,
+        'simple_blog/author.html',
+        context=context,
+    )
