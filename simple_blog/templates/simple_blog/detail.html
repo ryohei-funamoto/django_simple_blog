@@ -5,6 +5,11 @@
     <p>投稿日：<time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:'Y/m/d' }}</time></p>
     <p>更新日：<time datetime="{{ article.updated_at|date:'Y-m-d' }}">{{ article.updated_at|date:'Y/m/d' }}</time></p>
     <p>{{ article.content|linebreaksbr }}</p>
+    {% if user.is_authenticated and user == article.user %}
+        <ul>
+            <li><a href="{% url 'simple_blog:update' id=article.id %}">記事を編集する</a></li>
+        </ul>
+    {% endif %}
     <ul>
         <li><a href="{% url 'simple_blog:index' %}">記事一覧へ戻る</a></li>
     </ul>
