@@ -1,0 +1,25 @@
+{% extends 'components/base.html' %}
+{% block title %}コメント編集ページ | {{ block.super }}{% endblock %}
+{% block content %}
+    <h1>コメント編集ページ</h1>
+    <form action="{% url 'simple_blog:comment_update' id=comment.id %}" method="POST" novalidate>
+        {% csrf_token %}
+        <div>
+            <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+            {{ form.content }}
+            {% if form.content.errors %}
+                <ul>
+                    {% for error in form.content.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div>
+            <button type="submit">更新する</button>
+        </div>
+    </form>
+    <ul>
+        <li><a href="{% url 'simple_blog:show' id=article.id %}">記事詳細へ戻る</a></li>
+    </ul>
+{% endblock %}

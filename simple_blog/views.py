@@ -116,6 +116,33 @@ def delete(request, id):
     else:
         raise PermissionDenied
 
+@login_required
+def comment_update(request, id):
+    comment = get_object_or_404(Comment, pk=id)
+    form = CommentForm(request.POST or None, instance=comment)
+    article = comment.article
+
+    if request.user == comment.user:
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save()
+
+                return redirect('simple_blog:show', id=article.id)
+
+        context = {
+            'comment': comment,
+            'form': form,
+            'article': article,
+        }
+
+        return render(
+            request,
+            'simple_blog/comment_update.html',
+            context=context,
+        )
+    else:
+        raise PermissionDenied
+
 def author(request, id):
     User = get_user_model()
     author = get_object_or_404(User, pk=id)
