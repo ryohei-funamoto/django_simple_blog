@@ -17,6 +17,19 @@
             </li>
         </ul>
     {% endif %}
+    <h2>コメント一覧</h2>
+    <ul class="comments">
+        {% for comment in comments %}
+            <li class="comment">
+                <p>{{ comment.content }}</p>
+                <p>投稿者：<a href="{% url 'simple_blog:author' id=comment.user.id %}">{{ comment.user }}</a></p>
+                <p>投稿日：<time datetime="{{ comment.created_at|date:'Y-m-d' }}">{{ comment.created_at|date:'Y/m/d' }}</time></p>
+                <p>更新日：<time datetime="{{ comment.updated_at|date:'Y-m-d' }}">{{ comment.updated_at|date:'Y/m/d' }}</time></p>
+            </li>
+        {% empty %}
+            <li>この記事にコメントはありません。</li>
+        {% endfor %}
+    </ul>
     <ul>
         <li><a href="{% url 'simple_blog:index' %}">記事一覧へ戻る</a></li>
     </ul>

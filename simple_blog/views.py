@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from .models import Article
+from .models import Article, Comment
 from .forms import ArticleForm
 
 # Create your views here.
@@ -22,9 +22,11 @@ def index(request):
 
 def show(request, id):
     article = get_object_or_404(Article, pk=id)
+    comments = Comment.objects.filter(article__id=article.id).order_by('-created_at')
 
     context = {
         'article': article,
+        'comments': comments,
     }
 
     return render(
