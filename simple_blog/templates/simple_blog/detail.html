@@ -25,6 +25,11 @@
                 <p>投稿者：<a href="{% url 'simple_blog:author' id=comment.user.id %}">{{ comment.user }}</a></p>
                 <p>投稿日：<time datetime="{{ comment.created_at|date:'Y-m-d' }}">{{ comment.created_at|date:'Y/m/d' }}</time></p>
                 <p>更新日：<time datetime="{{ comment.updated_at|date:'Y-m-d' }}">{{ comment.updated_at|date:'Y/m/d' }}</time></p>
+                {% if user.is_authenticated and user == comment.user %}
+                    <ul>
+                        <li><a href="{% url 'simple_blog:comment_update' id=comment.id %}">編集する</a></li>
+                    </ul>
+                {% endif %}
             </li>
         {% empty %}
             <li>この記事にコメントはありません。</li>
