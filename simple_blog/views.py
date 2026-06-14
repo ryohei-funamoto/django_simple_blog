@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from .models import Article, Comment
-from .forms import ArticleForm
+from .forms import ArticleForm, CommentForm
 
 # Create your views here.
 
@@ -23,10 +23,22 @@ def index(request):
 def show(request, id):
     article = get_object_or_404(Article, pk=id)
     comments = Comment.objects.filter(article__id=article.id).order_by('-created_at')
+    form = CommentForm(request.POST or None)
+
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.article = article
+                comment.save()
+
+                return redirect('simple_blog:show', id=article.id)
 
     context = {
         'article': article,
         'comments': comments,
+        'form': form,
     }
 
     return render(
