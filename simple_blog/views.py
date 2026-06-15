@@ -143,6 +143,19 @@ def comment_update(request, id):
     else:
         raise PermissionDenied
 
+@login_required
+def comment_delete(request, id):
+    comment = get_object_or_404(Comment, pk=id)
+    article = comment.article
+
+    if request.user == comment.user:
+        if request.method == 'POST':
+            comment.delete()
+
+        return redirect('simple_blog:show', id=article.id)
+    else:
+        raise PermissionDenied
+
 def author(request, id):
     User = get_user_model()
     author = get_object_or_404(User, pk=id)

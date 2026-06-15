@@ -28,6 +28,12 @@
                 {% if user.is_authenticated and user == comment.user %}
                     <ul>
                         <li><a href="{% url 'simple_blog:comment_update' id=comment.id %}">編集する</a></li>
+                        <li>
+                            <form action="{% url 'simple_blog:comment_delete' id=comment.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('コメントを削除しますか？')">削除する</button>
+                            </form>
+                        </li>
                     </ul>
                 {% endif %}
             </li>
