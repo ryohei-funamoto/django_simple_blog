@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from .models import Article, Comment
 from .forms import ArticleForm, CommentForm
 
@@ -10,8 +11,12 @@ from .forms import ArticleForm, CommentForm
 def index(request):
     articles = Article.objects.all().order_by('-created_at')
 
+    paginator = Paginator(articles, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'articles': articles,
+        'page_obj': page_obj,
     }
 
     return render(
@@ -22,7 +27,12 @@ def index(request):
 
 def show(request, id):
     article = get_object_or_404(Article, pk=id)
+
     comments = Comment.objects.filter(article__id=article.id).order_by('-created_at')
+    paginator = Paginator(comments, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     form = CommentForm(request.POST or None)
 
     if request.user.is_authenticated:
@@ -37,7 +47,7 @@ def show(request, id):
 
     context = {
         'article': article,
-        'comments': comments,
+        'page_obj': page_obj,
         'form': form,
     }
 
@@ -162,9 +172,13 @@ def author(request, id):
 
     articles = Article.objects.filter(user_id=author.id).order_by('-created_at')
 
+    paginator = Paginator(articles, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'author': author,
-        'articles': articles,
+        'page_obj': page_obj,
     }
 
     return render(
