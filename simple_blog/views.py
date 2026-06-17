@@ -27,7 +27,12 @@ def index(request):
 
 def show(request, id):
     article = get_object_or_404(Article, pk=id)
+
     comments = Comment.objects.filter(article__id=article.id).order_by('-created_at')
+    paginator = Paginator(comments, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     form = CommentForm(request.POST or None)
 
     if request.user.is_authenticated:
@@ -42,7 +47,7 @@ def show(request, id):
 
     context = {
         'article': article,
-        'comments': comments,
+        'page_obj': page_obj,
         'form': form,
     }
 
