@@ -10,10 +10,7 @@ from .forms import ArticleForm, CommentForm
 
 def index(request):
     articles = Article.objects.all().order_by('-created_at')
-
-    paginator = Paginator(articles, 5)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginate_queryset(request, articles, 5)
 
     context = {
         'page_obj': page_obj,
@@ -27,23 +24,17 @@ def index(request):
 
 def show(request, id):
     article = get_object_or_404(Article, pk=id)
-
     comments = Comment.objects.filter(article__id=article.id).order_by('-created_at')
-    paginator = Paginator(comments, 3)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
+    page_obj = paginate_queryset(request, comments, 3)
     form = CommentForm(request.POST or None)
 
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.user = request.user
-                comment.article = article
-                comment.save()
+    if request.user.is_authenticated and request.method == 'POST' and form.is_valid():
+        comment = form.save(commit=False)
+        comment.user = request.user
+        comment.article = article
+        comment.save()
 
-                return redirect('simple_blog:show', id=article.id)
+        return redirect('simple_blog:show', id=article.id)
 
     context = {
         'article': article,
@@ -61,13 +52,12 @@ def show(request, id):
 def create(request):
     form = ArticleForm(request.POST or None)
 
-    if request.method == 'POST':
-        if form.is_valid():
-            article = form.save(commit=False)
-            article.user = request.user
-            article.save()
+    if request.method == 'POST' and form.is_valid():
+        article = form.save(commit=False)
+        article.user = request.user
+        article.save()
 
-            return redirect('simple_blog:show', id=article.id)
+        return redirect('simple_blog:show', id=article.id)
 
     context = {
         'form': form,
@@ -84,47 +74,38 @@ def update(request, id):
     article = get_object_or_404(Article, pk=id)
     form = ArticleForm(request.POST or None, instance=article)
 
-    if request.user == article.user:
-        if request.method == 'POST':
-            if form.is_valid():
-                form.save()
-
-                return redirect('simple_blog:show', id=article.id)
-
-        context = {
-            'article': article,
-            'form': form,
-        }
-
-        return render(
-            request,
-            'simple_blog/update.html',
-            context=context,
-        )
-    else:
+    if request.user != article.user:
         raise PermissionDenied
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+
+        return redirect('simple_blog:show', id=article.id)
+
+    context = {
+        'article': article,
+        'form': form,
+    }
+
+    return render(
+        request,
+        'simple_blog/update.html',
+        context=context,
+    )
 
 @login_required
 def delete(request, id):
     article = get_object_or_404(Article, pk=id)
 
-    if request.user == article.user:
-        if request.method == 'POST':
-            article.delete()
-
-            return redirect('simple_blog:index')
-
-        context = {
-            'article': article,
-        }
-
-        return render(
-            request,
-            'simple_blog/detail.html',
-            context=context,
-        )
-    else:
+    if request.user != article.user:
         raise PermissionDenied
+
+    if request.method == 'POST':
+        article.delete()
+
+        return redirect('simple_blog:index')
+
+    return redirect('simple_blog:show', id=article.id)
 
 @login_required
 def comment_update(request, id):
@@ -132,39 +113,38 @@ def comment_update(request, id):
     form = CommentForm(request.POST or None, instance=comment)
     article = comment.article
 
-    if request.user == comment.user:
-        if request.method == 'POST':
-            if form.is_valid():
-                form.save()
-
-                return redirect('simple_blog:show', id=article.id)
-
-        context = {
-            'comment': comment,
-            'form': form,
-            'article': article,
-        }
-
-        return render(
-            request,
-            'simple_blog/comment_update.html',
-            context=context,
-        )
-    else:
+    if request.user != comment.user:
         raise PermissionDenied
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+
+        return redirect('simple_blog:show', id=article.id)
+
+    context = {
+        'comment': comment,
+        'form': form,
+        'article': article,
+    }
+
+    return render(
+        request,
+        'simple_blog/comment_update.html',
+        context=context,
+    )
 
 @login_required
 def comment_delete(request, id):
     comment = get_object_or_404(Comment, pk=id)
     article = comment.article
 
-    if request.user == comment.user:
-        if request.method == 'POST':
-            comment.delete()
-
-        return redirect('simple_blog:show', id=article.id)
-    else:
+    if request.user != comment.user:
         raise PermissionDenied
+
+    if request.method == 'POST':
+        comment.delete()
+
+    return redirect('simple_blog:show', id=article.id)
 
 def author(request, id):
     User = get_user_model()
@@ -172,9 +152,7 @@ def author(request, id):
 
     articles = Article.objects.filter(user_id=author.id).order_by('-created_at')
 
-    paginator = Paginator(articles, 5)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginate_queryset(request, articles, 5)
 
     context = {
         'author': author,
@@ -186,3 +164,8 @@ def author(request, id):
         'simple_blog/author.html',
         context=context,
     )
+
+def paginate_queryset(request, queryset, per_page):
+    paginator = Paginator(queryset, per_page)
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
